@@ -1,0 +1,928 @@
+<html><!-- Copyright © (2001-2005) Clockwise - All rights reserved --><!--  http://www.clockwise.info   email:info@clockwise.info  --><head>
+<title>Uren invullen</title>
+<meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<script language="JavaScript" type="text/javascript">var cwroot='..';var urldir='/clockwise/sharevalue';var csjsversion='version=3.6.0&amp;build=20201104';</script>
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon"> 
+<link rel="icon" href="../images/favicon.ico" type="image/x-icon"> 
+<link rel="stylesheet" type="text/css" href="../includes/clockwise.css?version=3.6.0&amp;build=20201104" media="screen">
+<link rel="stylesheet" type="text/css" href="../skins/vrolijck/clockwise.css?version=3.6.0&amp;build=20201104" media="screen">
+<link rel="stylesheet" type="text/css" href="../includes/print.css?version=3.6.0&amp;build=20201104" media="print">
+<link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon"> 
+<link rel="icon" href="../images/favicon.ico" type="image/x-icon"> 
+<link rel="stylesheet" type="text/css" href="../includes/suggestfield.css?version=3.6.0&amp;build=20201104">
+<link rel="stylesheet" type="text/css" href="../libraries/jquery/chosen-1.8.7/chosen.clockwise.css?version=3.6.0&amp;build=20201104">
+<script language="JavaScript" type="text/javascript" src="../includes/javafunct.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/OptionTransfer.js"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/DynamicOptionList.js"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/AnchorPosition.js"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/PopupWindow.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/date.js"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/CalendarPopup.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/mk/CalendarPopupFix.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../includes/suggestfield.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/jquery/jquery-3.4.1.min.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/jquery/jquery-migrate-3.0.0.min.js?version=3.6.0&amp;build=20201104"></script>
+<script language="JavaScript" type="text/javascript" src="../libraries/jquery/chosen-1.8.7/chosen.jquery.js?version=3.6.0&amp;build=20201104"></script>
+
+<script language="JavaScript">
+var clock = new PopupWindow("clockdiv");
+clock.showPopup = Proper_showPopup;
+clock.hidePopup = Proper_hidePopup;
+clock.offsetX = 0;
+clock.offsetY = 24;
+clock.autoHide();
+clock.update_selected = clock_update_selected;
+clock.select = clock_select; 
+clock.hide = clock_hide;
+clock.update = clock_update;
+</script>
+<script language="JavaScript" type="text/javascript" src="../libraries/xloadtree/xmlextras.js"></script>
+<script language="JavaScript">
+function doTooltip(e, msg) { if ( typeof Tooltip == "undefined" || !Tooltip.ready ) return; Tooltip.show(e, msg); }
+function hideTip() { if ( typeof Tooltip == "undefined" || !Tooltip.ready ) return; Tooltip.hide(); }
+</script>
+<style type="text/css">
+<!--
+div#tipDiv {
+  position:absolute; visibility:hidden; left:0; top:0; z-index:10000;
+  background-color:#dee7f7; border:1px solid #336; 
+  width:250px; padding:3px;
+  color:#000; font-size:8pt; line-height:1.2;
+}
+-->
+</style>
+<script language="javascript" type="text/javascript" src="matrix.js?version=3.6.0&amp;build=20201104"></script>
+<link rel="stylesheet" type="text/css" href="contextmenu.css?version=3.6.0&amp;build=20201104">
+</head>
+<body onclick="ontop();" onunload="checkChanges()">
+<iframe id="popup_frame" name="popup_frame" src="../includes/empty.php" style="border-width: 1px; border-style: solid; border-color: rgb(0, 0, 119); position: absolute; visibility: hidden; left: -250px; width: 310px; height: 230px; z-index: 99999;" onload="resizeIframe(this,230);"></iframe>
+<iframe id="popup_frame2" name="popup_frame" src="../includes/empty.php" style="border-width: 1px; border-style: solid; border-color: rgb(0, 0, 119); position: absolute; visibility: hidden; left: -250px; width: 310px; height: 100px; z-index: 99999;" onload="resizeIframe(this);"></iframe>
+<script language="JavaScript1.2" src="contextmenu.js"></script>
+<script language="Javascript">
+var cwtxtjs = new Array();
+cwtxtjs['cnfrmopsl'] = "U heeft uw veranderingen niet opgeslagen! Alsnog opslaan voordat u weggaat van deze pagina?"
+cwtxtjs['opslbrblock'] = "Uw veranderingen kunnen niet worden opgeslagen omdat uw browser popup windows blokkeert."
+cwtxtjs['opslok'] = "Uw veranderingen worden nu opgeslagen"
+cwtxtjs['opslcancel'] = "U heeft uw veranderingen niet opgeslagen!"
+cwtxtjs['opmsluit'] = "U heeft aanpassingen gemaakt in de opmerkingen zonder op te slaan. Opmerkingen sluiten?"
+cwtxtjs['opmnogopen'] = "Er is nog een opmerkingenscherm geopend. Sluit deze eerst."
+geenmatrixjs = false;
+
+function madeChanges(obj) //dag,projectrow,overuren,check)
+{
+	if(!isChanged(obj)) {return;} // nothings changed
+	var form = document.forms['urenform'];
+	checkmsg_used = new Array();
+
+//	var ckval = new Array();
+
+	var dag = obj.name.substring(2,4);
+	var projectrow = obj.name.substring(4);
+	if (projectrow=='REISDREMPEL') return;
+
+	var msg = '';
+	var error = 0;
+
+	updPijltje(dag,projectrow);
+	if (!geenmatrixjs) updFields(dag,projectrow);
+
+	if (obj.value == obj.defaultValue) { return; }
+
+// global
+	var alltot = parseFloat(form.elements['u__t__t_'].value);
+	if (isNaN(alltot)) alltot = 0;
+// col specific
+	var coltot = parseFloat(form.elements['u_'+dag+'_t_'].value);
+	if (isNaN(coltot)) coltot = 0;
+// row specific
+	var rowtot = form.elements['u__t_'+projectrow]?parseFloat(form.elements['u__t_'+projectrow].value):0;
+	if (isNaN(rowtot)) rowtot = 0;
+	var overuren = form.elements['tvt'+projectrow]?1:0;
+	var aanvrprj = form.elements['aanv'+projectrow]?1:0;
+	var ir = form.elements['rest'+projectrow];
+	var rest = ir?parseFloat(ir.value):0;
+	var nogover = (rest) - (rowtot - parseFloat(obj.value));
+// entry specific
+	var entry = obj.value.replace(/,/,'.');
+	var pauze = '';
+	if (parseFloat(entry)) {
+		if (klein) {
+		} else {
+			entry = parseFloat(entry).toFixed(2);
+		}
+	}
+	obj.value = entry;
+	var defval = obj.defaultValue;
+
+	
+	if (!overuren && rest >=0 && rowtot > rest && entry>0) {
+		clearChanges(dag,projectrow,nogover);
+error = 1;
+ msg += checkmsg(sprintf('Foutmelding: Er zijn nog slechts %s uren op dit onderdeel te besteden',nogover<0?0:nogover));
+	}
+
+
+	if (!overuren && aanvrprj && rest >=0 && rowtot > rest && entry>0) {
+		 msg += checkmsg(sprintf('Waarschuwing: Er waren nog slechts %s uren op dit aanvraagproject te besteden',nogover<0?0:nogover));
+	}
+
+
+	if (isNaN(entry)) {
+		clearChanges(dag,projectrow,0.00);
+error = 1;
+ msg += checkmsg('Foutmelding: Geen geldig nummer ingevoerd');
+	}
+
+
+	if (msg) alert(msg);
+	if (obj.value != obj.defaultValue) { fchanged=1; }
+	if (isChanged(obj)) {
+		updPijltje(dag,projectrow);
+		if (!geenmatrixjs) updFields(dag,projectrow);
+	}
+}
+function submitCheck() {
+	var form = document.forms['urenform'];
+	checkmsg_used = new Array();
+	var rowteller = form.elements['rowteller']?form.elements['rowteller'].value:0;
+	var msg = '';
+	var error = 0;
+// global
+	var alltot = 0;
+	if(form.elements['u__t__t_'])
+		alltot = parseFloat(form.elements['u__t__t_'].value);
+	if (isNaN(alltot)) alltot = 0;
+// col specific
+
+// row specific
+
+// tot specific
+
+	var totteller = totaal_week.length;
+	for(var i=0 ; i < totteller ; i++) {
+		var weektot = 0;
+		var veld;
+		for(var j=0 ; j < totaal_week[i]['velden'].length ; j++) {
+			veld = totaal_week[i]['velden'][j];
+			weektot += parseFloat(form.elements[veld]&&form.elements[veld].value?form.elements[veld].value:0);
+		}
+		var week = totaal_week[i]['naam'];
+		weektot = weektot.toFixed(2);
+		
+	if (40.00 > 0 && weektot > 40.00) {
+		 msg += checkmsg(sprintf('Waarschuwing: U schrijft meer dan %s uur per week in week %s',40.00,week));
+	}
+
+	}
+
+	if (msg) alert(msg);
+	return error;
+}
+function inleverCheck(type,naam) {
+	var form = document.forms['urenform'];
+	checkmsg_used = new Array();
+	var msg = '';
+	var error = 0;
+// global
+	var alltot = 0;
+	if(form.elements['u__t__t_'])
+		alltot = parseFloat(form.elements['u__t__t_'].value);
+	if (isNaN(alltot)) alltot = 0;
+// col specific
+
+// row specific
+
+// tot specific
+
+	var totteller = totaal_week.length;
+	if (!type || type=='week')
+	for(var i=0 ; i < totteller ; i++) {
+		if (naam && !(naam==totaal_week[i]['naam'] || naam==totaal_week[i]['datum'])) continue;
+		var weektot = 0;
+		var veld;
+		for(var j=0 ; j < totaal_week[i]['velden'].length ; j++) {
+			veld = totaal_week[i]['velden'][j];
+			weektot += parseFloat(form.elements[veld]&&form.elements[veld].value?form.elements[veld].value:0);
+		}
+		var week = totaal_week[i]['naam'];
+		weektot = weektot.toFixed(2);
+		
+	if (40.00 > 0 && weektot > 40.00) {
+		 msg += checkmsg(sprintf('Waarschuwing: U schrijft meer dan %s uur per week in week %s',40.00,week));
+	}
+
+
+	if (40.00 > 0 && weektot < 40.00) {
+		 msg += checkmsg(sprintf('Waarschuwing: U schrijft minder dan %s uur per week in week %s',40.00,week));
+	}
+
+	}
+
+	if (msg) alert(msg);
+	return error;
+}
+</script>Laatste Inlog: 05-11-2020 <br><form autocomplete="off" action="matrix.php#here" method="POST" name="urenform">
+<input type="hidden" name="cwform_token[]" value="1eabe80d4e44197e50023b5597e0b2ba"><input type="hidden" name="tijd" value="1604586559">
+<input type="hidden" name="nieuwetijd" value="">
+<input type="hidden" name="nieuwvtype" value="">
+<input type="hidden" name="fverwerken" value="">
+<input type="hidden" name="aktie" value="">
+<input type="hidden" name="expand" value="">
+<input type="hidden" name="collapse" value="">
+<input type="hidden" name="silentmode" value="">
+<input type="hidden" name="toonaanpassingen" value="">
+<input type="hidden" name="delfeedback" value="">
+<input type="hidden" name="midverif" value="368">
+<input type="hidden" name="checkmedewerker" value="">
+<input type="hidden" name="projectaccoord" value="">
+<input type="hidden" name="backurl" value="">
+<input type="hidden" name="vtype" value="maand">
+<table border="0" cellspacing="0" cellpadding="0" cols="1">
+<tbody><tr><td>
+<div class="floater" id="topfloater"><table width="99%"><tbody><tr><td>
+Gebruiker: <b>Marthijn Wassink</b> (M.WASSINK@SHAREVALUE.NL)</td><td></td>
+<td align="right" nowrap="">
+<font size="2">Overzicht:&nbsp;</font><img title="Dag" align="absmiddle" src="../images/view/v3day_d.gif" style="margin:2;cursor:pointer" onclick="typewarp(document.urenform,'dag');/*document.forms[0].submit()*/"><img title="Week" align="absmiddle" src="../images/view/v3week_d.gif" style="margin:2;cursor:pointer" onclick="typewarp(document.urenform,'week');/*document.forms[0].submit()*/"><img title="Maand" align="absmiddle" src="../images/view/v3month.gif" style="margin:2;cursor:pointer" onclick="typewarp(document.urenform,'maand');/*document.forms[0].submit()*/"><img title="Selectie" align="absmiddle" src="../images/view/v3select_d.gif" style="margin:2;cursor:pointer" onclick="typewarp(document.urenform,'select');/*document.forms[0].submit()*/">&nbsp;&nbsp;<font size="2">Maand&nbsp;</font><img class="jogweek" style="cursor: pointer" align="absbottom" src="../images/jogbwd.gif" onclick="timewarp(document.urenform,1601589599)"><select class="jogweek" onchange="timewarp(document.urenform,this.value)" style="display: none;"><option value="1591048799">juni</option><option value="1593640799">juli</option><option value="1596319199">augustus</option><option value="1598997599">september</option><option value="1601589599">oktober</option><option value="1604271599" selected="">november</option><option value="1606863599">december</option><option value="1609541999">januari</option><option value="1612220399">februari</option><option value="1614639599">maart</option><option value="1617314399">april</option><option value="1619906399">mei</option></select><div class="chosen-container chosen-container-single" title="" style="width: 101px;"><a class="chosen-single">
+  <span>november</span>
+  <div><b></b></div>
+</a>
+<div class="chosen-drop">
+  <div class="chosen-search">
+    <input class="chosen-search-input" type="text" autocomplete="off">
+  </div>
+  <ul class="chosen-results"></ul>
+</div></div><img class="jogweek" style="cursor: pointer" align="absbottom" src="../images/jogfwd.gif" onclick="timewarp(document.urenform,1606863599)">&nbsp;&nbsp;&nbsp;<input type="button" name="verwerken" value="Opslaan" onclick="insert(this.form)">
+</td>
+</tr>
+<tr><td id="bfeedbackdiv2" colspan="11" style="display:none;border-top-width:1px;border-top-style:dotted;border-color:#777777"><table><tbody><tr><td style="vertical-align:top" colspan="3">Opmerking van <b>Marthijn Wassink</b> bij <input id="opmerkingbij" type="hidden" name="addopm[bij]" value=""><select name="addopm[bij_select]" style="font-size: 8pt; display: none;" onchange="e=element('opmerkingbij');e.value=this.value;"></select><div class="chosen-container chosen-container-single chosen-container-single-nosearch" title="" style="width: 15px;"><a class="chosen-single chosen-default">
+  <span> </span>
+  <div><b></b></div>
+</a>
+<div class="chosen-drop">
+  <div class="chosen-search">
+    <input class="chosen-search-input" type="text" autocomplete="off" readonly="">
+  </div>
+  <ul class="chosen-results"></ul>
+</div></div>&nbsp;&nbsp;&nbsp; <i>(dubbelklik op een uren veld om een marker te zetten)</i></td></tr><tr><td><textarea cols="80" rows="5" name="addopm[text]" style="width:500;font-family:Arial;font-size:10pt;border:1 solid #777777;overflow:visible;height:56"></textarea><input type="hidden" id="opmerkingaktie" name="addopm[aktie]" value=""></td><td style="vertical-align:bottom">&nbsp;<input type="button" value="Plaatsen" onclick="e=element('opmerkingbij');if(!e.value) {alert('Selecteer waar de opmerking bij hoort');} else {a=element('opmerkingaktie');a.value='opslaan';insert(this.form);}"></td><td width="200">&nbsp;</td></tr></tbody></table></td></tr></tbody></table></div><br></td></tr><tr><td>
+<table cellspacing="0" cellpadding="0" class="matrix" id="matrixtable"><tbody><tr id="headSticky_weekno"><th></th><th colspan="1" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">wk&nbsp;44</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th colspan="8" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">week&nbsp;45 2020</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th colspan="8" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">week&nbsp;46 2020</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th colspan="8" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">week&nbsp;47 2020</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th colspan="8" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">week&nbsp;48 2020</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th colspan="1" nowrap="" style="font-size:11px;vertical-align:top;padding-right:3px;" align="middle"><div class="zebracolor" style="text-align:center;">wk&nbsp;49</div></th>
+<th valign="top" colspan="" 0="">&nbsp;</th><th valign="top"></th><th valign="top" colspan="" 0="">&nbsp;</th></tr>
+<tr id="headSticky"><th valign="top" class="project">Project</th><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Zo&nbsp;01</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Ma&nbsp;02</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Di&nbsp;03</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Wo&nbsp;04</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div style="font-weight:bold;">Do&nbsp;05</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Vr&nbsp;06</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Za&nbsp;07</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Zo&nbsp;08</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Ma&nbsp;09</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Di&nbsp;10</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Wo&nbsp;11</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Do&nbsp;12</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Vr&nbsp;13</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Za&nbsp;14</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Zo&nbsp;15</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Ma&nbsp;16</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Di&nbsp;17</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Wo&nbsp;18</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Do&nbsp;19</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Vr&nbsp;20</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Za&nbsp;21</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Zo&nbsp;22</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Ma&nbsp;23</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Di&nbsp;24</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Wo&nbsp;25</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Do&nbsp;26</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Vr&nbsp;27</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Za&nbsp;28</div></th>
+<th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Zo&nbsp;29</div></th>
+<td class="weekendcue" width="20">&nbsp;</td><th class="uur" nowrap="" style="width:40px;font-size:11px;vertical-align:top;"><div>Ma&nbsp;30</div></th>
+<th valign="top" class="uurtotaal">Totaal</th></tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='11706';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>Facturabel</b>')" onmouseout="hideTip()"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;Facturabel</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='2835';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>Fast Flex QS</b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="20" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;Fast&nbsp;Flex&nbsp;QS</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_0" name="det_0" href="javascript:detail('13615','det_0')" onmouseover="doTooltip(event,'<b>2009 P001776 Marthijn - ING</b><br>Uren per week: 40')" onmouseout="hideTip()">2009&nbsp;P001776&nbsp;Marthijn&nbsp;-&nbsp;ING</a>&nbsp;<img src="../images/kaluitroep.gif" align="absmiddle" onmouseover="doTooltip(event,'deadline was/is op 30-09-2020')" onmouseout="hideTip()"><input type="hidden" name="_po_[0]" value="13615"><input type="hidden" name="rest0" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_000" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_000" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_010" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_010" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_020" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_020" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_030" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_030" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_040" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_040" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_050" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_050" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_060" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_060" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_070" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_070" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_080" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_080" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_090" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_090" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_100" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_100" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_110" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_110" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_120" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_120" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_130" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_130" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_140" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_140" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_150" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_150" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_160" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_160" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_170" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_170" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_180" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_180" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_190" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_190" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_200" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_200" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_210" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_210" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_220" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_220" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_230" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_230" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_240" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_240" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_250" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_250" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_260" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_260" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_270" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_270" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_280" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_280" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_290" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_290" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_0" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_1" name="det_1" href="javascript:detail('13949','det_1')" onmouseover="doTooltip(event,'<b>2011 P001845 Marthijn - ING</b><br>Uren per week: 36')" onmouseout="hideTip()">2011&nbsp;P001845&nbsp;Marthijn&nbsp;-&nbsp;ING</a>&nbsp;<img src="../images/kaluitroep.gif" align="absmiddle" onmouseover="doTooltip(event,'deadline was/is op 01-11-2020')" onmouseout="hideTip()"><input type="hidden" name="_po_[1]" value="13949"><input type="hidden" name="rest1" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_001" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_001" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_011" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_011" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_021" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_021" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_031" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_031" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_041" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_041" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_051" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_051" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_061" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_061" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_071" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_071" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_081" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_081" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_091" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_091" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_101" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_101" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_111" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_111" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_121" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_121" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_131" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_131" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_141" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_141" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_151" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_151" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_161" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_161" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_171" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_171" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_181" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_181" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_191" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_191" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_201" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_201" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_211" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_211" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_221" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_221" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_231" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_231" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_241" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_241" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_251" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_251" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_261" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_261" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_271" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_271" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_281" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_281" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="roveld kleinveld" name="u_291" value="" readonly="" onmouseover="doTooltip(event,'onderdeel is verlopen')" onmouseout="hideTip()"><img class="opmimg" id="p_291" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_1" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='671';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>Harvey Nash</b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="20" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;Harvey&nbsp;Nash</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_2" name="det_2" href="javascript:detail('13953','det_2')" onmouseover="doTooltip(event,'<b>2204 P001847 Marthijn</b><br>Uren per week: 36')" onmouseout="hideTip()">2204&nbsp;P001847&nbsp;Marthijn</a><input type="hidden" name="_po_[2]" value="13953"><input type="hidden" name="rest2" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_002" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_002" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_012" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_012" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_022" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_022" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_032" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_032" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_042" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_042" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_052" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_052" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_062" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_062" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_072" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_072" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_082" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_082" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_092" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_092" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_102" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_102" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_112" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_112" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_122" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_122" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_132" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_132" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_142" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_142" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_152" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_152" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_162" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_162" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_172" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_172" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_182" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_182" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_192" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_192" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_202" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_202" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_212" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_212" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_222" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_222" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_232" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_232" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_242" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_242" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_252" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_252" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_262" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_262" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_272" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_272" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_282" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_282" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_292" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_292" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_2" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='16';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>ShareValue intern</b>')" onmouseout="hideTip()"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;ShareValue&nbsp;intern</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='11825';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>2020</b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="20" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;2020</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='11826';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>2020 Bijzonder verlof</b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="40" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;2020&nbsp;Bijzonder&nbsp;verlof</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="60" height="1">&nbsp;<a class="onderdeel" id="det_3" name="det_3" href="javascript:detail('13015','det_3')" onmouseover="doTooltip(event,'<b>2020 Calamiteiten</b>')" onmouseout="hideTip()">2020&nbsp;Calamiteiten</a><input type="hidden" name="_po_[3]" value="13015"><input type="hidden" name="rest3" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_003" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_003" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_013" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_013" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_023" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_023" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_033" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_033" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_043" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_043" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_053" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_053" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_063" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_063" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_073" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_073" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_083" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_083" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_093" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_093" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_103" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_103" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_113" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_113" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_123" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_123" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_133" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_133" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_143" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_143" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_153" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_153" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_163" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_163" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_173" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_173" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_183" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_183" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_193" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_193" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_203" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_203" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_213" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_213" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_223" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_223" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_233" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_233" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_243" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_243" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_253" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_253" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_263" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_263" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_273" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_273" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_283" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_283" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_293" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_293" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_3" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><img src="../images/p.gif" border="0" width="60" height="1">&nbsp;<a class="onderdeel" id="det_4" name="det_4" href="javascript:detail('13274','det_4')" onmouseover="doTooltip(event,'<b>2020 Kraam/geboorte verlof</b><br>Na de bevalling mag je eenmaal je aantal contracturen schrijven als verlof, binnen 4 weken na de bevalling. Of 4 weken na thuiskomst ziekenhuisbevalling van de baby')" onmouseout="hideTip()">2020&nbsp;Kraam/geboorte&nbsp;verlof</a><input type="hidden" name="_po_[4]" value="13274"><input type="hidden" name="rest4" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_004" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_004" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_014" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_014" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_024" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_024" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_034" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_034" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_044" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_044" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_054" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_054" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_064" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_064" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_074" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_074" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_084" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_084" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_094" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_094" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_104" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_104" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_114" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_114" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_124" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_124" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_134" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_134" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_144" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_144" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_154" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_154" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_164" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_164" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_174" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_174" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_184" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_184" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_194" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_194" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_204" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_204" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_214" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_214" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_224" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_224" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_234" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_234" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_244" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_244" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_254" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_254" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_264" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_264" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_274" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_274" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_284" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_284" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_294" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_294" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_4" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_5" name="det_5" href="javascript:detail('12002','det_5')" onmouseover="doTooltip(event,'<b>2020 Feestdagen</b>')" onmouseout="hideTip()">2020&nbsp;Feestdagen</a><input type="hidden" name="_po_[5]" value="12002"><input type="hidden" name="rest5" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_005" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_005" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_015" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_015" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_025" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_025" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_035" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_035" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_045" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_045" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_055" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_055" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_065" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_065" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_075" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_075" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_085" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_085" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_095" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_095" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_105" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_105" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_115" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_115" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_125" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_125" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_135" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_135" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_145" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_145" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_155" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_155" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_165" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_165" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_175" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_175" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_185" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_185" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_195" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_195" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_205" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_205" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_215" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_215" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_225" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_225" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_235" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_235" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_245" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_245" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_255" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_255" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_265" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_265" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_275" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_275" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_285" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_285" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_295" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_295" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_5" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_6" name="det_6" href="javascript:detail('12161','det_6')" onmouseover="doTooltip(event,'<b>2020 Niet declarabel</b>')" onmouseout="hideTip()">2020&nbsp;Niet&nbsp;declarabel</a><input type="hidden" name="_po_[6]" value="12161"><input type="hidden" name="rest6" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_006" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_006" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_016" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_016" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_026" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_026" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_036" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_036" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_046" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_046" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_056" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_056" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_066" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_066" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_076" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_076" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_086" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_086" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_096" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_096" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_106" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_106" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_116" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_116" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_126" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_126" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_136" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_136" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_146" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_146" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_156" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_156" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_166" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_166" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_176" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_176" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_186" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_186" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_196" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_196" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_206" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_206" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_216" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_216" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_226" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_226" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_236" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_236" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_246" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_246" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_256" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_256" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_266" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_266" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_276" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_276" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_286" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_286" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_296" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_296" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_6" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_7" name="det_7" href="javascript:detail('12459','det_7')" onmouseover="doTooltip(event,'<b>2020 Tijd voor tijd</b>')" onmouseout="hideTip()">2020&nbsp;Tijd&nbsp;voor&nbsp;tijd</a> (0)<input type="hidden" name="_po_[7]" value="12459"><input type="hidden" name="rest7" value="0"><input type="hidden" name="tvt7" value="1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_007" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_007" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_017" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_017" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_027" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_027" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_037" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_037" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_047" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_047" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_057" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_057" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_067" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_067" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_077" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_077" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_087" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_087" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_097" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_097" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_107" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_107" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_117" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_117" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_127" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_127" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_137" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_137" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_147" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_147" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_157" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_157" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_167" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_167" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_177" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_177" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_187" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_187" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_197" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_197" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_207" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_207" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_217" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_217" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_227" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_227" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_237" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_237" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_247" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_247" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_257" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_257" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_267" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_267" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_277" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_277" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_287" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_287" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_297" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_297" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_7" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='13764';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>Ziekteuren</b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="40" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;Ziekteuren</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="60" height="1">&nbsp;<a class="onderdeel" id="det_8" name="det_8" href="javascript:detail('12378','det_8')" onmouseover="doTooltip(event,'<b>2020 Ziek </b>')" onmouseout="hideTip()">2020&nbsp;Ziek&nbsp;</a><input type="hidden" name="_po_[8]" value="12378"><input type="hidden" name="rest8" value="-1">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_008" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_008" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_018" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_018" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_028" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_028" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_038" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_038" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_048" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_048" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_058" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_058" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_068" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_068" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_078" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_078" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_088" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_088" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_098" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_098" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_108" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_108" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_118" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_118" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_128" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_128" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_138" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_138" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_148" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_148" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_158" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_158" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_168" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_168" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_178" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_178" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_188" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_188" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_198" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_198" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_208" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_208" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_218" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_218" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_228" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_228" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_238" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_238" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_248" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_248" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_258" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_258" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_268" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_268" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_278" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_278" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_288" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_288" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_298" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_298" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_8" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><input type="hidden" name="ppvar" value="1"><a class="project" href="javascript:void(0)" onclick="document.urenform.collapse.value='25';insert(document.urenform);event.cancelBubble=true;" onmouseover="doTooltip(event,'<b>Vakantie </b>')" onmouseout="hideTip()"><img src="../images/p.gif" border="0" width="20" height="1"><img src="../skins/vrolijck/colmin.gif" alt="-" align="absmiddle" border="0">&nbsp;&nbsp;Vakantie&nbsp;</a></td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="weekendcue" width="20">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_9" name="det_9" href="javascript:detail('11427','det_9')" onmouseover="doTooltip(event,'<b>2020 Vakantiedagen boven wettelijk</b>')" onmouseout="hideTip()">2020&nbsp;Vakantiedagen&nbsp;boven&nbsp;wettelijk</a><input type="hidden" name="_po_[9]" value="11427"><input type="hidden" name="aanv9" value="1"><input type="hidden" name="rest9" value="13.69">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_009" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_009" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_019" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_019" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_029" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_029" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_039" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_039" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_049" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_049" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_059" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_059" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_069" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_069" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_079" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_079" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_089" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_089" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_099" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_099" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_109" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_109" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_119" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_119" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_129" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_129" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_139" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_139" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_149" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_149" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_159" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_159" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_169" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_169" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_179" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_179" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_189" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_189" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_199" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_199" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_209" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_209" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_219" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_219" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_229" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_229" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_239" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_239" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_249" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_249" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_259" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_259" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_269" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_269" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_279" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_279" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_289" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_289" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_299" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_299" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_9" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_10" name="det_10" href="javascript:detail('11807','det_10')" onmouseover="doTooltip(event,'<b>2020 Vakantiedagen transport 2019</b><br>De maximale uren die over waren uit 2019')" onmouseout="hideTip()">2020&nbsp;Vakantiedagen&nbsp;transport&nbsp;2019</a><input type="hidden" name="_po_[10]" value="11807"><input type="hidden" name="aanv10" value="1"><input type="hidden" name="rest10" value="0.009999999999998">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0010" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0010" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0110" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0110" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0210" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0210" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0310" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0310" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0410" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0410" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0510" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0510" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0610" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0610" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0710" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0710" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0810" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0810" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0910" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0910" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1010" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1010" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1110" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1110" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1210" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1210" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1310" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1310" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1410" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1410" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1510" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1510" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1610" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1610" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1710" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1710" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1810" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1810" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1910" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1910" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2010" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2010" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2110" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2110" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2210" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2210" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2310" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2310" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2410" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2410" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2510" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2510" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2610" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2610" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2710" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2710" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2810" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2810" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2910" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2910" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_10" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr class="zebracolor"><td nowrap=""><img src="../images/p.gif" border="0" width="40" height="1">&nbsp;<a class="onderdeel" id="det_11" name="det_11" href="javascript:detail('11496','det_11')" onmouseover="doTooltip(event,'<b>2020 Vakantiedagen wettelijk</b>')" onmouseout="hideTip()">2020&nbsp;Vakantiedagen&nbsp;wettelijk</a><input type="hidden" name="_po_[11]" value="11496"><input type="hidden" name="aanv11" value="1"><input type="hidden" name="rest11" value="160">&nbsp;</td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0011" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0011" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0111" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0111" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0211" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0211" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0311" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0311" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0411" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0411" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0511" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0511" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0611" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0611" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0711" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0711" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0811" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0811" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_0911" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_0911" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1011" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1011" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1111" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1111" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1211" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1211" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1311" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1311" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1411" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1411" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1511" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1511" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1611" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1611" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1711" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1711" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1811" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1811" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_1911" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_1911" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2011" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2011" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2111" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2111" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2211" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2211" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2311" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2311" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2411" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2411" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2511" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2511" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2611" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2611" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2711" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2711" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2811" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2811" width="2" height="2" src="../images/p.gif"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="invoerveld kleinveld" name="u_2911" value="" onblur="useh(event)" onpaste="useh(event)"><img class="opmimg" id="p_2911" width="2" height="2" src="../images/p.gif"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t_11" value="" readonly="" style="text-align:left"></td>
+</tr>
+<tr><td>&nbsp;Totaal&nbsp;<input type="hidden" name="colteller" value="12">&nbsp;<input type="hidden" name="rowteller" value="30"></td><td nowrap=""><input type="text" size="5" class="totveld" name="u_00_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_01_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_02_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_03_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_04_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_05_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_06_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_07_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_08_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_09_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_10_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_11_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_12_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_13_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_14_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_15_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_16_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_17_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_18_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_19_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_20_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_21_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_22_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_23_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_24_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_25_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_26_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_27_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u_28_t_" value="" readonly="" style="text-align:left"></td>
+<td class="weekendcue" width="20">&nbsp;</td><td nowrap=""><input type="text" size="5" class="totveld" name="u_29_t_" value="" readonly="" style="text-align:left"></td>
+<td nowrap=""><input type="text" size="5" class="totveld" name="u__t__t_" value="" readonly="" style="text-align:left"></td>
+</tr></tbody></table></td></tr><tr><td>
+<br><div class="floater" id="bottomfloater"><table width="99%"><tbody><tr><td width="30" style="vertical-align:top">&nbsp;</td><td><table cellpadding="0" cellspacing="0"><tbody><tr><td width="30" style="width:30">&nbsp;</td><td style="vertical-align:top"><span style="white-space:nowrap">Week&nbsp;44b&nbsp;(vanaf&nbsp;01-11)&nbsp;<span><input type="checkbox" name="usn[week][2020-11-01]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-01')) {return this.checked=0;} if(confirm('Week 44b (vanaf 01-11) inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-01]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span style="white-space:nowrap">Week&nbsp;45&nbsp;<span><input type="checkbox" name="usn[week][2020-11-02]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-02')) {return this.checked=0;} if(confirm('Week 45 inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-02]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span style="white-space:nowrap">Week&nbsp;46&nbsp;<span><input type="checkbox" name="usn[week][2020-11-09]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-09')) {return this.checked=0;} if(confirm('Week 46 inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-09]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span style="white-space:nowrap">Week&nbsp;47&nbsp;<span><input type="checkbox" name="usn[week][2020-11-16]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-16')) {return this.checked=0;} if(confirm('Week 47 inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-16]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span style="white-space:nowrap">Week&nbsp;48&nbsp;<span><input type="checkbox" name="usn[week][2020-11-23]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-23')) {return this.checked=0;} if(confirm('Week 48 inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-23]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span style="white-space:nowrap">Week&nbsp;49a&nbsp;(t/m&nbsp;30-11)&nbsp;<span><input type="checkbox" name="usn[week][2020-11-30]" onclick="if(this.checked &amp;&amp; inleverCheck('week','2020-11-30')) {return this.checked=0;} if(confirm('Week 49a (t/m 30-11) inleveren? Hierna kunnen geen veranderingen meer gemaakt worden!')) { if(insert(this.form)) this.checked=this.defaultChecked; } else { this.checked=this.defaultChecked }" value="R">&nbsp;inleveren</span><span><input type="checkbox" name="usn[week][2020-11-30]" onclick="insert(this.form)" value="G" disabled="">&nbsp;goedkeuren</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+&nbsp;&nbsp;&nbsp;</td><td width="30" style="width:30">&nbsp;</td><td style="vertical-align:top">&nbsp;&nbsp;&nbsp;</td><td width="30" style="width:30">&nbsp;</td><td style="vertical-align:top">&nbsp;&nbsp;&nbsp;</td></tr></tbody></table></td>
+<td align="right" style="vertical-align:top" nowrap="">
+<font size="2">Maand&nbsp;</font><img class="jogweek" style="cursor: pointer" align="absbottom" src="../images/jogbwd.gif" onclick="timewarp(document.urenform,1601589599)"><select class="jogweek" onchange="timewarp(document.urenform,this.value)" style="display: none;"><option value="1591048799">juni</option><option value="1593640799">juli</option><option value="1596319199">augustus</option><option value="1598997599">september</option><option value="1601589599">oktober</option><option value="1604271599" selected="">november</option><option value="1606863599">december</option><option value="1609541999">januari</option><option value="1612220399">februari</option><option value="1614639599">maart</option><option value="1617314399">april</option><option value="1619906399">mei</option></select><div class="chosen-container chosen-container-single" title="" style="width: 101px;"><a class="chosen-single">
+  <span>november</span>
+  <div><b></b></div>
+</a>
+<div class="chosen-drop">
+  <div class="chosen-search">
+    <input class="chosen-search-input" type="text" autocomplete="off">
+  </div>
+  <ul class="chosen-results"></ul>
+</div></div><img class="jogweek" style="cursor: pointer" align="absbottom" src="../images/jogfwd.gif" onclick="timewarp(document.urenform,1606863599)">&nbsp;&nbsp;&nbsp;
+<input type="button" name="verwerken" value="Opslaan" onclick="insert(this.form)">
+</td></tr></tbody></table></div></td></tr></tbody></table>
+<input type="hidden" name="_weekrest_0" value="0">
+<input type="hidden" name="_weekrest_7" value="0">
+<input type="hidden" name="_weekrest_14" value="0">
+<input type="hidden" name="_weekrest_21" value="0">
+<input type="hidden" name="_weekrest_28" value="0">
+<input type="hidden" name="_weekrest_29" value="0">
+</form><script language="JavaScript">
+var totaal_week = new Array();
+var totaal_maand = new Array();
+var totaal_periode = new Array();
+var a = new Array();
+a['naam']='44';
+a['datum']='2020-11-01';
+a['velden']=new Array();
+a['velden'].push('u_00_t_');
+a['velden'].push('_weekrest_0');
+totaal_week.push(a);
+var a = new Array();
+a['naam']='45';
+a['datum']='2020-11-02';
+a['velden']=new Array();
+a['velden'].push('u_01_t_');
+a['velden'].push('u_02_t_');
+a['velden'].push('u_03_t_');
+a['velden'].push('u_04_t_');
+a['velden'].push('u_05_t_');
+a['velden'].push('u_06_t_');
+a['velden'].push('u_07_t_');
+a['velden'].push('_weekrest_7');
+totaal_week.push(a);
+var a = new Array();
+a['naam']='46';
+a['datum']='2020-11-09';
+a['velden']=new Array();
+a['velden'].push('u_08_t_');
+a['velden'].push('u_09_t_');
+a['velden'].push('u_10_t_');
+a['velden'].push('u_11_t_');
+a['velden'].push('u_12_t_');
+a['velden'].push('u_13_t_');
+a['velden'].push('u_14_t_');
+a['velden'].push('_weekrest_14');
+totaal_week.push(a);
+var a = new Array();
+a['naam']='47';
+a['datum']='2020-11-16';
+a['velden']=new Array();
+a['velden'].push('u_15_t_');
+a['velden'].push('u_16_t_');
+a['velden'].push('u_17_t_');
+a['velden'].push('u_18_t_');
+a['velden'].push('u_19_t_');
+a['velden'].push('u_20_t_');
+a['velden'].push('u_21_t_');
+a['velden'].push('_weekrest_21');
+totaal_week.push(a);
+var a = new Array();
+a['naam']='48';
+a['datum']='2020-11-23';
+a['velden']=new Array();
+a['velden'].push('u_22_t_');
+a['velden'].push('u_23_t_');
+a['velden'].push('u_24_t_');
+a['velden'].push('u_25_t_');
+a['velden'].push('u_26_t_');
+a['velden'].push('u_27_t_');
+a['velden'].push('u_28_t_');
+a['velden'].push('_weekrest_28');
+totaal_week.push(a);
+var a = new Array();
+a['naam']='49';
+a['datum']='2020-11-30';
+a['velden']=new Array();
+a['velden'].push('u_29_t_');
+a['velden'].push('_weekrest_29');
+totaal_week.push(a);
+var popups_framed = 1;
+var loadclockimages = 0;
+var klein = 1;
+var matime = '1604271599';
+var skindir = '../skins/vrolijck';
+var fchanged = 0;
+var checkmedewerker = '';
+var allow0hour = 0;
+var multipleuren = 1;
+var mandatory_alwayspopup = 0;
+function preventunload() {
+	if (checkChanges()) {
+		if(confirm(cwtxtjs['cnfrmopsl'])) {	
+			return true;
+		} else {
+			forceReloadOrPageLeave = true;
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
+if (document.all && window.print && typeof(contextmenu)!="undefined")
+	contextmenu.className = menuskin;
+document.onclick = useh;
+var oFrm = document.urenform;
+//for (i=0; i<oFrm.length; i++) oFrm.elements[i].onblur = useh;
+//for (i=0; i<oFrm.length; i++) oFrm.elements[i].onpaste = useh;
+//document.onblur = urenschermEventHandler;
+document.onkeydown = useh;
+document.onkeyup = useh;
+if (typeof(showcontextmenu)!="undefined")
+	document.oncontextmenu = showcontextmenu;
+if (0 && typeof(window.addEventListener) != 'undefined' && typeof(window.mozInnerScreenX) != 'undefined') {
+	//FF
+	//only here to trigger clicks for ff to hide ie5 menu window
+	window.addEventListener('click',function(e){useh(e)});
+}
+if(loadclockimages) {
+	for(var t1 = 0; t1 < 12 ; t1++) for(var t2 = 0; t2 < 60 ; t2+=15) {
+		eval('pic'+(t1<10?"0":"")+t1+(t2<10?"0":"")+t2+' = new Image(145,145);');
+		eval('pic'+(t1<10?"0":"")+t1+(t2<10?"0":"")+t2+'.src = "../images/clock/c'+(t1<10?"0":"")+t1+(t2<10?"0":"")+t2+'.gif";');
+	}
+}
+//sticky_install(['maSticky','diSticky','woSticky','doSticky','vrSticky','zaSticky','zoSticky']);
+// must be onload actually: 
+//setTimeout("sticky_install(['topfloater','bottomfloater']);",1000);
+//setTimeout("sticky_install(['matrixtable']);",1500);
+//setTimeout("sticky_install(['headSticky']);",2000);
+setTimeout("sticky_install(['topfloater','bottomfloater','matrixtable']);",1000); //400?
+setTimeout("sticky_install(['headSticky']);",1200); //500?
+</script>
+<div id="contextmenu" class="contextmenu" style="display:none">
+<div><span class="menuitems 0.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="0.00">0&nbsp;uur</span>  <span class="menuitemskl 0.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="0.25">0:15</span>  <span class="menuitemskl 0.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="0.50">0:30</span>  <span class="menuitemskl 0.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="0.75">0:45</span></div><div><span class="menuitems 1.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="1.00">1&nbsp;uur</span>  <span class="menuitemskl 1.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="1.25">1:15</span>  <span class="menuitemskl 1.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="1.50">1:30</span>  <span class="menuitemskl 1.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="1.75">1:45</span></div><div><span class="menuitems 2.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="2.00">2&nbsp;uur</span>  <span class="menuitemskl 2.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="2.25">2:15</span>  <span class="menuitemskl 2.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="2.50">2:30</span>  <span class="menuitemskl 2.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="2.75">2:45</span></div><div><span class="menuitems 3.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="3.00">3&nbsp;uur</span>  <span class="menuitemskl 3.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="3.25">3:15</span>  <span class="menuitemskl 3.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="3.50">3:30</span>  <span class="menuitemskl 3.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="3.75">3:45</span></div><div><span class="menuitems 4.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="4.00">4&nbsp;uur</span>  <span class="menuitemskl 4.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="4.25">4:15</span>  <span class="menuitemskl 4.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="4.50">4:30</span>  <span class="menuitemskl 4.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="4.75">4:45</span></div><div><span class="menuitems 5.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="5.00">5&nbsp;uur</span>  <span class="menuitemskl 5.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="5.25">5:15</span>  <span class="menuitemskl 5.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="5.50">5:30</span>  <span class="menuitemskl 5.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="5.75">5:45</span></div><div><span class="menuitems 6.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="6.00">6&nbsp;uur</span>  <span class="menuitemskl 6.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="6.25">6:15</span>  <span class="menuitemskl 6.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="6.50">6:30</span>  <span class="menuitemskl 6.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="6.75">6:45</span></div><div><span class="menuitems 7.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="7.00">7&nbsp;uur</span>  <span class="menuitemskl 7.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="7.25">7:15</span>  <span class="menuitemskl 7.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="7.50">7:30</span>  <span class="menuitemskl 7.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="7.75">7:45</span></div><div><span class="menuitems 8.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="8.00">8&nbsp;uur</span>  <span class="menuitemskl 8.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="8.25">8:15</span>  <span class="menuitemskl 8.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="8.50">8:30</span>  <span class="menuitemskl 8.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="8.75">8:45</span></div><div><span class="menuitems 9.00" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="9.00">9&nbsp;uur</span>  <span class="menuitemskl 9.15" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="9.25">9:15</span>  <span class="menuitemskl 9.30" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="9.50">9:30</span>  <span class="menuitemskl 9.45" onmouseover="highlight(this)" onmouseout="lowlight(this)" onclick="jumpto(this, event)" value="9.75">9:45</span></div></div>
+<script language="JavaScript">
+  function uses_jquerychosen_init(el,extra_config) {
+    if (typeof(el) == 'object') {
+      $(el).find('select').not(".classicselect").chosen('destroy');
+    }
+    var config = {
+        disable_search_threshold: 10,
+        search_contains: true,
+      no_results_text: "Geen resultaten gevonden",
+      placeholder_text_single: " ",
+      placeholder_text_multiple: " ",
+      width_extra: 15
+    };
+      if (extra_config) for (var attrname in extra_config) { config[attrname] = extra_config[attrname]; }
+    $(typeof(el)=='object'?el:":root").find("select").not(".classicselect").chosen(config);
+
+    
+    if (typeof(el)=='object') {
+      $(el).find("select").not(".classicselect").each(function() {
+        if (this.name && this.nextSibling && this.nextSibling.className && this.nextSibling.className.match(/\bchosen\-container\b/) && this.nextSibling.firstChild && this.nextSibling.firstChild.className && this.className.match(/\bcwforms_(un)?changed\b/)) {
+          var match;
+          if (match=this.className.match(/\bcwforms_(un)?changed\b/)) {
+            this.nextSibling.firstChild.className.replace(/\s*\bcwforms_(un)?changed\b/,'');
+            this.nextSibling.firstChild.className += ' '+match[0];
+          }
+        }
+      });
+    }
+  }
+
+	$(document).ready(uses_jquerychosen_init);
+</script>
+<script language="JavaScript" src="../libraries/dw/dw_event.js"></script>
+<script language="JavaScript" src="../libraries/dw/dw_viewport.js"></script>
+<script language="JavaScript" src="../libraries/dw/dw_tooltip_sel.js"></script><div id="tipDiv"></div>
+<div id="caldiv" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;z-index:999"></div>
+
+</body></html>
